@@ -6,6 +6,7 @@ import time
 import re
 from urllib.parse import urlparse
 import uuid  # Add this for unique cache keys
+import errno
 
 # Configuration
 HOST = '127.0.0.1'  # Localhost
@@ -162,10 +163,23 @@ class LoadBalancer:
                             print(f"Error parsing response headers: {e}")
             
             # Cache successful responses for cacheable endpoints
+            # if should_cache and response_data and self.is_success_response(response_data):
+            #     with open(cache_file, 'wb') as f:
+            #         f.write(response_data)
+            #     print(f"Response cached to {cache_file}")
             if should_cache and response_data and self.is_success_response(response_data):
-                with open(cache_file, 'wb') as f:
-                    f.write(response_data)
-                print(f"Response cached to {cache_file}")
+                try:
+                    # Ensure cache directory exists
+                    os.makedirs(CACHE_DIR, exist_ok=True)
+                    with open(cache_file, 'wb') as f:
+                        f.write(response_data)
+                    print(f"Response cached to {cache_file}")
+                except OSError as e:
+                    # Handle specific cache write errors
+                    if e.errno in (errno.ENOENT, errno.EACCES):
+                        print(f"Cache write error] {e} → skip caching, still 200")
+                    else:
+                        raise
             
             # Send response back to client
             if response_data:
