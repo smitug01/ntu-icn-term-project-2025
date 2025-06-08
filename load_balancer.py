@@ -261,9 +261,9 @@ class LoadBalancer:
     def get_filename_from_path(self, path):
         """Extract filename from path for caching purposes."""
         if path == '/':
-            return 'root_index.html'  # 改個名避免衝突
+            return 'root_index.html'  # Cache root path as 'root_index.html'
         
-        normalized = path.lstrip('/')  # 移除開頭的 '/'
+        normalized = path.lstrip('/')  # Remove leading slash
         
         if path.endswith('/'):
             normalized = normalized.rstrip('/') + '_index'
