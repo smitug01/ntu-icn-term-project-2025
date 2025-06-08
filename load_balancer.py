@@ -260,9 +260,15 @@ class LoadBalancer:
     
     def get_filename_from_path(self, path):
         """Extract filename from path for caching purposes."""
-        if path == '/' or path.endswith('/'):
-            return 'index.html'
-        return path.split('/')[-1]
+        if path == '/':
+            return 'root_index.html'  # 改個名避免衝突
+        
+        normalized = path.lstrip('/')  # 移除開頭的 '/'
+        
+        if path.endswith('/'):
+            normalized = normalized.rstrip('/') + '_index'
+        
+        return normalized.replace('/', '_')
     
     def get_backend_from_cookie(self, headers):
         """Extract backend server from cookie header."""
